@@ -1,0 +1,11 @@
+CREATE DATABASE census;
+USE census;
+CREATE TABLE person (
+  persid         int,
+  lastname       string,
+  firstname      string
+)
+ROW FORMAT  DELIMITED  FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH 'file:///root/hive/example/person001' OVERWRITE INTO TABLE person;
+SELECT persid, lastname, firstname FROM person;

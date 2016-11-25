@@ -1,0 +1,102 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS assessdb;
+USE assessdb;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.account001 (
+  id         string,
+  pid        string,
+  accountno  string,
+  balance    string
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.account001;
+
+INSERT INTO TABLE assessdb.account001 
+SELECT
+  id,
+  pid,
+  accountno,
+  balance
+FROM retrievedb.rawaccount 
+WHERE id <> '"id"';
+
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.account002 (
+  id         string,
+  pid        string,
+  accountno  string,
+  balance    string
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.account002;
+
+INSERT INTO TABLE assessdb.account002 
+SELECT
+  id,
+  pid,
+  rtrim(ltrim(accountno)),
+  balance
+FROM assessdb.account001;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.account003 (
+  id         INT,
+  pid        INT,
+  accountid  INT,
+  accountno  string,
+  balance    DECIMAL(18, 9)
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.account003;
+
+INSERT INTO TABLE assessdb.account003 
+SELECT
+  CAST(id as INT),
+  CAST(pid as INT),
+  CAST(accountno as INT),
+  CONCAT('AC',accountno),
+  CAST(balance as DECIMAL(18, 9))
+FROM assessdb.account002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.account (
+  id         INT,
+  pid        INT,
+  accountid  INT,
+  accountno  string,
+  balance    DECIMAL(18, 9)
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.account;
+
+INSERT INTO TABLE assessdb.account
+SELECT
+  id,
+  pid,
+  accountid,
+  accountno,
+  balance
+ FROM
+  assessdb.account003; 
+ 
+--#######################################################################################################################################
+--#######################################################################################################################################
+DROP TABLE assessdb.account001;
+DROP TABLE assessdb.account002;
+DROP TABLE assessdb.account003;

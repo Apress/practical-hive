@@ -1,0 +1,108 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS processdb;
+USE processdb;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.objecthub (
+  id          int,
+  objecttype  string,
+  objectname  string,
+  objectid    int
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+   
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.objecthub;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.objecthub001 (  
+  objecttype  string,
+  objectname  string,
+  objectid    int
+)
+CLUSTERED BY (objecttype, objectname,objectid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+   
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.objecthub001;
+   
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.objecthub001 
+SELECT DISTINCT
+  'intangible', 
+  'bankaccount',
+  accountid 
+FROM 
+  assessdb.account;
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.objecthub;
+
+INSERT INTO TABLE processdb.objecthub 
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY objecttype,objectname,objectid),
+  objecttype, 
+  objectname,
+  objectid 
+FROM 
+  processdb.objecthub001;
+     
+--#######################################################################################################################################   
+--#######################################################################################################################################  
+CREATE TABLE IF NOT EXISTS processdb.objectbankaccountsatellite0001 (
+  accountid           int,
+  transactionid       int,
+  balance             DECIMAL(18, 9)
+)
+CLUSTERED BY (accountid,transactionid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+   
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.objectbankaccountsatellite001;
+   
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.objectbankaccountsatellite0001
+SELECT 
+  accountid, 
+  id as transactionid,
+  balance 
+FROM 
+  assessdb.account;
+   
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.objectbankaccountsatellite (
+  id                  int,
+  accountid           int,
+  transactionid       int,
+  balance             DECIMAL(18, 9),
+  timestmp            bigint
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+   
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.objectbankaccountsatellite;
+   
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.objectbankaccountsatellite
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY accountid,transactionid),
+  accountid, 
+  transactionid,
+  balance,
+  unix_timestamp()
+FROM 
+  processdb.objectbankaccountsatellite0001;
+   
+--#######################################################################################################################################   
+--#######################################################################################################################################
+DROP TABLE processdb.objectbankaccountsatellite0001;
+DROP TABLE processdb.objecthub001;
+SHOW TABLES;

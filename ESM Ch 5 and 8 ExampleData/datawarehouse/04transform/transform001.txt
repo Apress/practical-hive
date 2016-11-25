@@ -1,0 +1,87 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+DROP DATABASE transformdb CASCADE;
+
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS transformdb;
+USE transformdb;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS transformdb.dimperson (
+  personkey  BIGINT,
+  firstname  STRING,
+  lastname   STRING
+)
+CLUSTERED BY (firstname, lastname,personkey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+  
+--#######################################################################################################################################
+TRUNCATE TABLE transformdb.dimperson;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS transformdb.dimperson001 (
+  firstname  STRING,
+  lastname   STRING
+)
+CLUSTERED BY (firstname, lastname) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+  
+--#######################################################################################################################################
+TRUNCATE TABLE transformdb.dimperson001;
+    
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.dimperson001 
+SELECT DISTINCT
+  firstname, 
+  lastname 
+FROM 
+  processdb.personhub;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS transformdb.dimperson002 (
+  personkey  BIGINT,
+  firstname  STRING,
+  lastname   STRING
+)
+CLUSTERED BY (firstname, lastname,personkey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE transformdb.dimperson002; 
+
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.dimperson002
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY firstname, lastname),
+  firstname, 
+  lastname 
+FROM 
+  transformdb.dimperson001;
+  
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.dimperson
+SELECT 
+  personkey,
+  firstname, 
+  lastname 
+FROM 
+  transformdb.dimperson002
+ORDER BY firstname, lastname, personkey;
+ 
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.dimperson
+VALUES
+(999997,'Ruff','Hond'),
+(999998,'Robbie','Rot'),
+(999999,'Helen','Kat');
+  
+--#######################################################################################################################################
+DROP TABLE transformdb.dimperson001;
+DROP TABLE transformdb.dimperson002;
+  
+--#######################################################################################################################################
+SHOW TABLES;

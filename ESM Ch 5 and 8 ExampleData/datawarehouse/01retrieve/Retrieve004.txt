@@ -1,0 +1,15 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS retrievedb;
+USE retrievedb;
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS retrievedb.rawaccount (
+  id         string,
+  pid        string,
+  accountno  string,
+  balance    string
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH 'file:///root/exampledata/datawarehouse/00rawdata/rawaccount.csv' OVERWRITE INTO TABLE retrievedb.rawaccount;

@@ -1,0 +1,223 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS processdb;
+USE processdb;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.locationhub (
+  id            INT,
+  locationtype  STRING,
+  locationname  STRING,
+  locationid    INT
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE processdb.locationhub;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.locationhub001 (  
+  locationtype  STRING,
+  locationname  STRING,
+  locationid    INT
+)
+CLUSTERED BY (locationtype, locationname,locationid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.locationhub001;
+
+INSERT INTO TABLE processdb.locationhub001 
+SELECT DISTINCT
+  'intangible', 
+  'geospace',
+  id as locationid 
+FROM 
+  assessdb.postaddress;
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.locationhub;
+
+INSERT INTO TABLE processdb.locationhub 
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY locationtype,locationname,locationid),
+  locationtype, 
+  locationname,
+  locationid 
+FROM 
+  processdb.locationhub001;
+     
+--#######################################################################################################################################   
+--#######################################################################################################################################  
+CREATE TABLE IF NOT EXISTS processdb.locationgeospacesatellite0001 (
+  locationid    INT,
+  postcode      STRING,
+  latitude      DECIMAL(18, 9),
+  longitude     DECIMAL(18, 9),
+  easting       INT,
+  northing      INT,
+  gridref       STRING,
+  district      STRING,
+  ward          STRING,
+  districtcode  STRING,
+  wardcode      STRING,
+  country       STRING,
+  countycode    STRING,
+  constituency  STRING,
+  typearea      STRING
+)
+CLUSTERED BY (locationid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.locationgeospacesatellite0001;
+
+INSERT INTO TABLE processdb.locationgeospacesatellite0001
+SELECT
+  id as locationid,
+  postcode,
+  latitude,
+  longitude,
+  easting,
+  northing,
+  gridref,
+  district,
+  ward,
+  districtcode,
+  wardcode,
+  country,
+  countycode,
+  constituency,
+  typearea
+FROM 
+  assessdb.postaddress;
+ 
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.locationgeospace1satellite (
+  id            INT,
+  locationid    INT,
+  postcode      STRING,
+  timestmp      BIGINT
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.locationgeospace1satellite;
+
+INSERT INTO TABLE processdb.locationgeospace1satellite
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY locationid),
+  locationid,
+  postcode,
+  unix_timestamp()
+FROM 
+  processdb.locationgeospacesatellite0001
+ORDER BY locationid;
+ 
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.locationgeospace2satellite (
+  id            INT,
+  locationid    INT,
+  latitude      DECIMAL(18, 9),
+  longitude     DECIMAL(18, 9),
+  timestmp      BIGINT
+)
+CLUSTERED BY (id, locationid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.locationgeospace2satellite;
+
+INSERT INTO TABLE processdb.locationgeospace2satellite
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY locationid),
+  locationid,
+  latitude,
+  longitude,
+  unix_timestamp()
+FROM 
+  processdb.locationgeospacesatellite0001;
+
+ 
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.locationgeospace3satellite (
+  id            INT,
+  locationid    INT,
+  easting       INT,
+  northing      INT,
+  timestmp      BIGINT
+)
+CLUSTERED BY (id, locationid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.locationgeospace3satellite;
+
+INSERT INTO TABLE processdb.locationgeospace3satellite
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY locationid),
+  locationid,
+  easting,
+  northing,
+  unix_timestamp()
+FROM 
+  processdb.locationgeospacesatellite0001;  
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.locationgeospace4satellite (
+  id            INT,
+  locationid    INT,
+  postcode      STRING,
+  latitude      DECIMAL(18, 9),
+  longitude     DECIMAL(18, 9),
+  easting       INT,
+  northing      INT,
+  gridref       STRING,
+  district      STRING,
+  ward          STRING,
+  districtcode  STRING,
+  wardcode      STRING,
+  country       STRING,
+  countycode    STRING,
+  constituency  STRING,
+  typearea      STRING,
+  timestmp      BIGINT
+)
+CLUSTERED BY (id, locationid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.locationgeospace4satellite;
+
+INSERT INTO TABLE processdb.locationgeospace4satellite
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY locationid),
+  locationid,
+  postcode,
+  latitude,
+  longitude,
+  easting,
+  northing,
+  gridref,
+  district,
+  ward,
+  districtcode,
+  wardcode,
+  country,
+  countycode,
+  constituency,
+  typearea,
+  unix_timestamp()
+FROM 
+  processdb.locationgeospacesatellite0001;  
+--#######################################################################################################################################   
+--#######################################################################################################################################
+DROP TABLE processdb.locationgeospacesatellite0001;
+DROP TABLE processdb.locationhub001;
+SHOW TABLES;

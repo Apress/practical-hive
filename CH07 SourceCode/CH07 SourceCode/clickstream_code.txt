@@ -1,0 +1,29 @@
+CREATE DATABASE clickstream;
+
+USE clickstream;
+
+CREATE TABLE wikilogs (
+  	previous_id 	STRING,
+  	current_id 	STRING,
+  	no_occurences	INT,
+  	previous_title 	STRING,
+  	current_title  	STRING,
+  	type		STRING)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '09'
+STORED AS textfile;
+
+LOAD DATA INPATH '/tmp/wikiclickstream/2015_01_clickstream.tsv.gz' OVERWRITE INTO TABLE wikilogs;
+
+CREATE VIEW wikilogs_view (no_occurences, previous_title, current_title)
+AS SELECT no_occurences, previous_title, current_title FROM wikilogs;
+
+SELECT * FROM wikilogs_view
+SORT BY no_occurences DESC;
+
+
+SELECT * FROM wikilogs_view
+WHERE previous_title = 'other-facebook'
+SORT BY no_occurences DESC;
+
+

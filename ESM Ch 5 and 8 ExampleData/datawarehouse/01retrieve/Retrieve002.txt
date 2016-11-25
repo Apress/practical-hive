@@ -1,0 +1,25 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS retrievedb;
+USE retrievedb;
+--#######################################################################################################################################
+--DROP TABLE retrievedb.rawdatetime;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS retrievedb.rawdatetime (
+  id            string,
+  datetimes     string,
+  monthname     string,
+  yearnumber    string,
+  monthnumber   string,
+  daynumber     string,
+  hournumber    string,
+  minutenumber  string,
+  ampm          string
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH 'file:///root/exampledata/datawarehouse/00rawdata/rawdatetime.csv' OVERWRITE INTO TABLE retrievedb.rawdatetime;
+
+--#######################################################################################################################################

@@ -1,0 +1,40 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS retrievedb;
+USE retrievedb;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS retrievedb.rawaddress (
+  id            string,
+  Postcode      string,
+  Latitude      string,
+  Longitude     string,
+  Easting       string,
+  Northing      string,
+  GridRef       string,
+  District      string,
+  Ward          string,
+  DistrictCode  string,
+  WardCode      string,
+  Country       string,
+  CountyCode    string,
+  Constituency  string,
+  TypeArea      string
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH 'file:///root/exampledata/datawarehouse/00rawdata/rawaddress.csv' OVERWRITE INTO TABLE retrievedb.rawaddress;
+
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS retrievedb.rawaddresshistory (
+  id            string,
+  pid           string,
+  aid           string,
+  did1          string,
+  did2          string
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH 'file:///root/exampledata/datawarehouse/00rawdata/rawaddresshistory.csv' OVERWRITE INTO TABLE retrievedb.rawaddresshistory;

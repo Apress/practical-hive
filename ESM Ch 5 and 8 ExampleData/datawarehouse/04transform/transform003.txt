@@ -1,0 +1,86 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS transformdb;
+USE transformdb;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS transformdb.fctpersonaccount (
+  personaccountkey     BIGINT,
+  personkey            BIGINT,
+  accountkey           BIGINT,
+  balance             DECIMAL(18, 9)
+)
+CLUSTERED BY (personkey,accountkey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+  
+--#######################################################################################################################################
+TRUNCATE TABLE transformdb.fctpersonaccount;
+ 
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS transformdb.fctpersonaccount001 (
+  personkey            BIGINT,
+  accountkey           BIGINT,
+  balance             DECIMAL(18, 9)
+)
+CLUSTERED BY (personkey,accountkey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+   
+--#######################################################################################################################################
+TRUNCATE TABLE transformdb.fctpersonaccount001;
+   
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.fctpersonaccount001
+VALUES
+(999997,88888887,10.60),
+(999997,88888887,400.70),
+(999997,88888887,-210.90),
+(999998,88888888,1000.00),
+(999998,88888888,1990.60),
+(999998,88888888,900.70),
+(999999,88888889,160.60),
+(999999,88888889,180.70),
+(999999,88888889,100.60),
+(999999,88888889,120.90),
+(999999,88888889,180.69),
+(999999,88888889,130.30);
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS transformdb.fctpersonaccount002 (
+  personkey      BIGINT,
+  accountkey     BIGINT,
+  balance        DECIMAL(18, 9)
+)
+CLUSTERED BY (personkey,accountkey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+   
+--#######################################################################################################################################
+TRUNCATE TABLE transformdb.fctpersonaccount002;     
+     
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.fctpersonaccount002
+SELECT 
+CAST(personkey AS BIGINT), 
+CAST(accountkey AS BIGINT), 
+CAST(SUM(balance) AS DECIMAL(18, 9))
+FROM transformdb.fctpersonaccount001
+GROUP BY personkey, accountkey;
+
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.fctpersonaccount
+SELECT 
+ROW_NUMBER() OVER (ORDER BY personkey, accountkey),
+CAST(personkey AS BIGINT), 
+CAST(accountkey AS BIGINT), 
+CAST(balance AS DECIMAL(18, 9))
+FROM transformdb.fctpersonaccount002;
+
+--#######################################################################################################################################
+DROP TABLE transformdb.fctpersonaccount001;
+DROP TABLE transformdb.fctpersonaccount002; 
+
+--#######################################################################################################################################
+SHOW TABLES;

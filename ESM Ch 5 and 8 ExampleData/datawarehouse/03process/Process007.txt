@@ -1,0 +1,33 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS processdb;
+USE processdb;
+ 
+--#######################################################################################################################################
+DROP TABLE processdb.person_event_link002;
+DROP TABLE processdb.person_location_link002;
+DROP TABLE processdb.person_object_link002;
+DROP TABLE processdb.person_person_link002;
+DROP TABLE processdb.person_time_link002;
+DROP TABLE processdb.personlink001;   
+--#######################################################################################################################################
+DROP TABLE processdb.object_event_link002;
+DROP TABLE processdb.object_location_link002;
+DROP TABLE processdb.object_object_link002;
+DROP TABLE processdb.object_time_link002;
+DROP TABLE processdb.objectlink001;  
+--#######################################################################################################################################
+DROP TABLE processdb.location_event_link002;
+DROP TABLE processdb.location_location_link002;
+DROP TABLE processdb.location_time_link002;
+DROP TABLE processdb.locationlink001; 
+--#######################################################################################################################################
+DROP TABLE processdb.event_event_link002;
+DROP TABLE processdb.event_time_link002;
+DROP TABLE processdb.eventlink001;
+--#######################################################################################################################################
+DROP TABLE processdb.time_time_link002;
+DROP TABLE processdb.timelink001;
+
+SHOW TABLES;

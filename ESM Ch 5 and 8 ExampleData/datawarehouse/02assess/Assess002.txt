@@ -1,0 +1,141 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS assessdb;
+USE assessdb;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS assessdb.datetime001 (
+  id            string,
+  datetimes     string,
+  monthname     string,
+  yearnumber    string,
+  monthnumber   string,
+  daynumber     string,
+  hournumber    string,
+  minutenumber  string,
+  ampm          string
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.datetime001;
+
+INSERT INTO TABLE assessdb.datetime001 
+SELECT
+  id,
+  datetimes,
+  monthname,
+  yearnumber,
+  monthnumber,
+  daynumber,
+  hournumber,
+  minutenumber,
+  ampm
+FROM retrievedb.rawdatetime 
+WHERE id <> '"id"';
+
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS assessdb.datetime002 (
+  id            string,
+  datetimes     string,
+  monthname     string,
+  yearnumber    string,
+  monthnumber   string,
+  daynumber     string,
+  hournumber    string,
+  minutenumber  string,
+  ampm          string
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.datetime002;
+
+INSERT INTO TABLE assessdb.datetime002 
+SELECT
+  id,
+  rtrim(ltrim(datetimes)),
+  rtrim(ltrim(monthname)),
+  rtrim(ltrim(yearnumber)),
+  rtrim(ltrim(monthnumber)),
+  rtrim(ltrim(daynumber)),
+  rtrim(ltrim(hournumber)),
+  rtrim(ltrim(minutenumber)),
+  rtrim(ltrim(ampm))
+FROM assessdb.datetime001;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS assessdb.datetime003 (
+  id            int,
+  datetimes     string,
+  monthname     string,
+  yearnumber    int,
+  monthnumber   int,
+  daynumber     int,
+  hournumber    int,
+  minutenumber  int,
+  ampm          string
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.datetime003;
+
+INSERT INTO TABLE assessdb.datetime003 
+SELECT
+  CAST(id as INT),
+  SUBSTRING(datetimes,2,LENGTH(datetimes)-2),
+  SUBSTRING(monthname,2,LENGTH(monthname)-2),
+  CAST(yearnumber as INT),
+  CAST(monthnumber as INT),
+  CAST(daynumber as INT),
+  CAST(hournumber as INT),
+  CAST(minutenumber as INT),
+  SUBSTRING(ampm,2,LENGTH(ampm)-2)
+FROM assessdb.datetime002;
+
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS assessdb.dates (
+  id            int,
+  datetimes     string,
+  monthname     string,
+  yearnumber    int,
+  monthnumber   int,
+  daynumber     int,
+  hournumber    int,
+  minutenumber  int,
+  ampm          string
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.dates;
+
+INSERT INTO TABLE assessdb.dates
+SELECT
+  id,
+  datetimes,
+  monthname,
+  yearnumber,
+  monthnumber,
+  daynumber,
+  hournumber,
+  minutenumber,
+  ampm
+FROM assessdb.datetime003;
+
+--#######################################################################################################################################
+DROP TABLE assessdb.datetime001;
+DROP TABLE assessdb.datetime002;
+DROP TABLE assessdb.datetime003;

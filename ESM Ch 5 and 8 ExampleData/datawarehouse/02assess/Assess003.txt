@@ -1,0 +1,292 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS assessdb;
+USE assessdb;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.address001 (
+  id            STRING,
+  postcode      STRING,
+  latitude      STRING,
+  longitude     STRING,
+  easting       STRING,
+  northing      STRING,
+  gridref       STRING,
+  district      STRING,
+  ward          STRING,
+  districtcode  STRING,
+  wardcode      STRING,
+  country       STRING,
+  countycode    STRING,
+  constituency  STRING,
+  typearea      STRING
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.address001;
+
+INSERT INTO TABLE assessdb.address001 
+SELECT
+  id,
+  postcode,
+  latitude,
+  longitude,
+  easting,
+  northing,
+  gridref,
+  district,
+  ward,
+  districtcode,
+  wardcode,
+  country,
+  countycode,
+  constituency,
+  typearea
+FROM retrievedb.rawaddress 
+WHERE id <> '"id"';
+
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.address002 (
+  id            STRING,
+  postcode      STRING,
+  latitude      STRING,
+  longitude     STRING,
+  easting       STRING,
+  northing      STRING,
+  gridref       STRING,
+  district      STRING,
+  ward          STRING,
+  districtcode  STRING,
+  wardcode      STRING,
+  country       STRING,
+  countycode    STRING,
+  constituency  STRING,
+  typearea      STRING
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.address002;
+
+INSERT INTO TABLE assessdb.address002 
+SELECT
+  id,
+  rtrim(ltrim(postcode)),
+  rtrim(ltrim(latitude)),
+  rtrim(ltrim(longitude)),
+  rtrim(ltrim(easting)),
+  rtrim(ltrim(northing)),
+  rtrim(ltrim(gridref)),
+  rtrim(ltrim(district)),
+  rtrim(ltrim(ward)),
+  rtrim(ltrim(districtcode)),
+  rtrim(ltrim(wardcode)),
+  rtrim(ltrim(country)),
+  rtrim(ltrim(countycode)),
+  rtrim(ltrim(constituency)),
+  rtrim(ltrim(typearea))
+FROM assessdb.address001;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.address003 (
+  id            INT,
+  postcode      STRING,
+  latitude      DECIMAL(18, 9),
+  longitude     DECIMAL(18, 9),
+  easting       INT,
+  northing      INT,
+  gridref       STRING,
+  district      STRING,
+  ward          STRING,
+  districtcode  STRING,
+  wardcode      STRING,
+  country       STRING,
+  countycode    STRING,
+  constituency  STRING,
+  typearea      STRING
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.address003;
+
+INSERT INTO TABLE assessdb.address003 
+SELECT
+  CAST(id as INT),
+  SUBSTRING(postcode,2,LENGTH(postcode)-2),
+  CAST(latitude as DECIMAL(18, 9)),
+  CAST(longitude as DECIMAL(18, 9)),
+  CAST(easting as INT),
+  CAST(northing as INT),
+  SUBSTRING(gridref,2,LENGTH(gridref)-2),
+  SUBSTRING(district,2,LENGTH(district)-2),
+  SUBSTRING(ward,2,LENGTH(ward)-2),
+  SUBSTRING(districtcode,2,LENGTH(districtcode)-2),
+  SUBSTRING(wardcode,2,LENGTH(wardcode)-2),
+  SUBSTRING(country,2,LENGTH(country)-2),
+  SUBSTRING(countycode,2,LENGTH(countycode)-2),
+  SUBSTRING(constituency,2,LENGTH(constituency)-2),
+  SUBSTRING(typearea,2,LENGTH(typearea)-2)
+FROM assessdb.address002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.postaddress (
+  id            INT,
+  postcode      STRING,
+  latitude      DECIMAL(18, 9),
+  longitude     DECIMAL(18, 9),
+  easting       INT,
+  northing      INT,
+  gridref       STRING,
+  district      STRING,
+  ward          STRING,
+  districtcode  STRING,
+  wardcode      STRING,
+  country       STRING,
+  countycode    STRING,
+  constituency  STRING,
+  typearea      STRING
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+INSERT INTO TABLE assessdb.postaddress
+SELECT
+  id,
+  postcode,
+  latitude,
+  longitude,
+  easting,
+  northing,
+  gridref,
+  district,
+  ward,
+  districtcode,
+  wardcode,
+  country,
+  countycode,
+  constituency,
+  typearea
+ FROM
+  assessdb.address003; 
+  
+--#######################################################################################################################################  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.addresshistory001 (
+  id            STRING,
+  pid           STRING,
+  aid           STRING,
+  did1          STRING,
+  did2          STRING
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.addresshistory001;
+
+INSERT INTO TABLE assessdb.addresshistory001
+SELECT
+  id,
+  pid,
+  aid ,
+  did1,
+  did2
+FROM
+  retrievedb.rawaddresshistory
+WHERE id <> '"id"'; 
+ 
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.addresshistory002 (
+  id            INT,
+  pid           INT,
+  aid           INT,
+  did1          INT,
+  did2          INT
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.addresshistory002;
+
+INSERT INTO TABLE assessdb.addresshistory002
+SELECT
+  CAST(id as INT),
+  CAST(pid as INT),
+  CAST(aid as INT),
+  CAST(did1 as INT),
+  CAST(did2 as INT)
+FROM
+  assessdb.addresshistory001;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.addresshistory (
+  id            INT,
+  pid           INT,
+  aid           INT,
+  did1          INT,
+  did2          INT
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.addresshistory;
+
+INSERT INTO TABLE assessdb.addresshistory
+SELECT
+  id,
+  pid,
+  aid ,
+  did1,
+  did2
+FROM
+  assessdb.addresshistory002;
+ 
+--####################################################################################################################################### 
+DROP TABLE assessdb.address001;
+DROP TABLE assessdb.address002;
+DROP TABLE assessdb.address003;
+
+DROP TABLE assessdb.addresshistory001;
+DROP TABLE assessdb.addresshistory002;
+
+--####################################################################################################################################### 
+	SELECT
+	  addresshistory.id,
+	  addresshistory.pid,
+	  personfull.firstname,
+	  personfull.lastname,
+	  addresshistory.aid,
+	  postaddress.postcode,
+	  addresshistory.did1,
+	  dates1.datetimes as startdate,
+	  addresshistory.did2,
+	  dates2.datetimes as enddate
+	FROM
+	  assessdb.addresshistory
+	JOIN
+	  assessdb.personfull
+	ON
+	  addresshistory.pid = personfull.persid
+	JOIN
+	  assessdb.postaddress
+	ON 
+	  addresshistory.aid = postaddress.id
+	JOIN
+	  assessdb.dates as dates1
+	ON
+	  addresshistory.did1 = dates1.id
+	JOIN
+	  assessdb.dates as dates2
+	ON
+	  addresshistory.did2 = dates2.id
+	LIMIT 10;

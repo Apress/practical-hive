@@ -1,0 +1,80 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS transformdb;
+USE transformdb;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS transformdb.dimaccount (
+  accountkey      BIGINT,
+  accountnumber   INT
+)
+CLUSTERED BY (accountnumber,accountkey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+  
+--#######################################################################################################################################
+TRUNCATE TABLE transformdb.dimaccount;
+ 
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS transformdb.dimaccount001 (
+  accountnumber   INT
+)
+CLUSTERED BY (accountnumber) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+  
+--#######################################################################################################################################
+TRUNCATE TABLE transformdb.dimaccount001;
+
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.dimaccount001 
+SELECT DISTINCT
+  objectid 
+FROM 
+  processdb.objecthub
+WHERE objecttype = 'intangible'
+AND objectname = 'bankaccount';
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS transformdb.dimaccount002 (
+  accountkey      BIGINT,
+  accountnumber   INT
+)
+CLUSTERED BY (accountnumber,accountkey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+  
+--#######################################################################################################################################
+TRUNCATE TABLE transformdb.dimaccount002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.dimaccount002 
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY accountnumber DESC),
+  accountnumber  
+FROM 
+  transformdb.dimaccount001;
+
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.dimaccount 
+SELECT DISTINCT
+  accountkey,
+  accountnumber  
+FROM 
+  transformdb.dimaccount002
+ORDER BY accountnumber; 
+
+--#######################################################################################################################################
+INSERT INTO TABLE transformdb.dimaccount 
+VALUES
+(88888887,208887),
+(88888888,208888),
+(88888889,208889);
+
+--#######################################################################################################################################
+DROP TABLE transformdb.dimaccount001;
+DROP TABLE transformdb.dimaccount002;
+ 
+--#######################################################################################################################################
+SHOW TABLES;

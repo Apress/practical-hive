@@ -1,0 +1,30 @@
+USE census;
+
+SELECT personname.firstname, 
+personname.lastname,
+address.postname 
+FROM
+census.personname
+LEFT JOIN
+census.address
+ON (personname.persid = address.persid);
+
+
+SELECT personname.firstname, 
+personname.lastname,
+address.postname 
+FROM
+census.personname
+RIGHT JOIN
+census.address
+ON (personname.persid = address.persid);
+
+
+SELECT personname.firstname, 
+personname.lastname,
+address.postname 
+FROM
+census.personname
+FULL OUTER JOIN
+census.address
+ON (personname.persid = address.persid);

@@ -1,0 +1,112 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS processdb;
+USE processdb;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.timehub (
+  id            INT,
+  timeid    INT
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.timehub;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.timehub001 (
+  timeid    INT
+)
+CLUSTERED BY (timeid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.timehub001;
+
+INSERT INTO TABLE processdb.timehub001 
+SELECT DISTINCT
+  id as timeid 
+FROM 
+  assessdb.dates
+WHERE yearnumber = 2015;
+
+INSERT INTO TABLE processdb.timehub001 
+SELECT DISTINCT
+  id as timeid 
+FROM 
+  assessdb.dates
+WHERE yearnumber = 2016;
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.timehub;
+
+INSERT INTO TABLE processdb.timehub 
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY timeid),
+  timeid 
+FROM 
+  processdb.timehub001;
+     
+--#######################################################################################################################################   
+--#######################################################################################################################################  
+CREATE TABLE IF NOT EXISTS processdb.timesatellite0001 (
+  timeid        INT,
+  datetimes     string
+)
+CLUSTERED BY (timeid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.timesatellite0001;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.timesatellite0001
+SELECT
+  id as timeid,
+  datetimes
+FROM 
+  assessdb.dates
+WHERE yearnumber = 2015;
+
+--#######
+INSERT INTO TABLE processdb.timesatellite0001
+SELECT
+  id as timeid,
+  datetimes
+FROM 
+  assessdb.dates
+WHERE yearnumber = 2016;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.time1satellite (
+  id            INT,
+  timeid        INT,
+  datetimes     STRING,
+  timestmp      BIGINT
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.time1satellite;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.time1satellite
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY timeid),
+  timeid,
+  datetimes,
+  unix_timestamp()
+FROM 
+  processdb.timesatellite0001
+ORDER BY timeid; 
+
+--#######################################################################################################################################
+DROP TABLE processdb.timesatellite0001;
+DROP TABLE processdb.timehub001;
+SHOW TABLES;

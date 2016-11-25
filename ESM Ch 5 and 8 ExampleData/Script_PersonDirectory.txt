@@ -1,0 +1,11 @@
+hadoop fs -ls
+hadoop fs -mkdir 'exampleoutput'
+hive
+
+USE census;
+INSERT OVERWRITE DIRECTORY 'exampleoutput' ROW FORMAT  DELIMITED  FIELDS TERMINATED BY ',' 
+SELECT persid, firstname, lastname FROM person;
+exit;
+
+hadoop fs -ls 'exampleoutput'
+hadoop fs -cat 'exampleoutput/000000_0'

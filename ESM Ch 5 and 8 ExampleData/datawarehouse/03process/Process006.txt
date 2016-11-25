@@ -1,0 +1,702 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS processdb;
+USE processdb;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.person_person_link(
+  id INT,
+  personid1 INT,
+  personid2 INT
+)
+CLUSTERED BY (id, personid1, personid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_person_link;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.person_person_link002(
+  personid1 INT,
+  personid2 INT
+)
+CLUSTERED BY (personid1, personid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_person_link002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.personlink001(
+  personid INT
+)
+CLUSTERED BY (personid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.personlink001;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.personlink001
+SELECT
+  personhub.id as personid
+FROM
+  processdb.personhub
+LIMIT 10;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.object_object_link(
+  id INT,
+  objectid1 INT,
+  objectid2 INT
+)
+CLUSTERED BY (id, objectid1, objectid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.object_object_link;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.object_object_link002(
+  objectid1 INT,
+  objectid2 INT
+)
+CLUSTERED BY (objectid1, objectid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.object_object_link002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.objectlink001(
+  objectid INT
+)
+CLUSTERED BY (objectid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.objectlink001;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.objectlink001
+SELECT
+  objecthub.id as objectid
+FROM
+  processdb.objecthub
+LIMIT 10;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.location_location_link(
+  id INT,
+  locationid1 INT,
+  locationid2 INT
+)
+CLUSTERED BY (id, locationid1, locationid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.location_location_link;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.location_location_link002(
+  locationid1 INT,
+  locationid2 INT
+)
+CLUSTERED BY (locationid1, locationid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.location_location_link002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.locationlink001(
+  locationid INT
+)
+CLUSTERED BY (locationid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.locationlink001;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.locationlink001
+SELECT
+  locationhub.id as locationid
+FROM
+  processdb.locationhub
+LIMIT 10;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.event_event_link(
+  id INT,
+  eventid1 INT,
+  eventid2 INT
+)
+CLUSTERED BY (id, eventid1, eventid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.event_event_link;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.event_event_link002(
+  eventid1 INT,
+  eventid2 INT
+)
+CLUSTERED BY (eventid1, eventid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.event_event_link002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.eventlink001(
+  eventid INT
+)
+CLUSTERED BY (eventid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.eventlink001;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.eventlink001
+SELECT
+  eventhub.id as eventid
+FROM
+  processdb.eventhub
+LIMIT 10;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.time_time_link(
+  id INT,
+  timeid1 INT,
+  timeid2 INT
+)
+CLUSTERED BY (id, timeid1, timeid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.time_time_link;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.time_time_link002(
+  timeid1 INT,
+  timeid2 INT
+)
+CLUSTERED BY (timeid1, timeid2) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.time_time_link002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.timelink001(
+  timeid INT
+)
+CLUSTERED BY (timeid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.timelink001;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.timelink001
+SELECT
+  timehub.id as timeid
+FROM
+  processdb.timehub
+LIMIT 10;
+
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.person_object_link002(
+  personid INT,
+  objectid INT
+)
+CLUSTERED BY (personid, objectid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_object_link002;
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.person_object_link002
+SELECT DISTINCT
+  personlink001.id as personid,
+  objectlink001.id as objectid
+FROM
+  processdb.personlink001
+GROSS JOIN
+  processdb.objectlink001
+LIMIT 20;
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_object_link002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.person_object_link002
+SELECT personhub.id, objecthub.objectid 
+FROM assessdb.account 
+JOIN
+processdb.personhub
+ON account.pid = personhub.id
+JOIN
+processdb.objecthub
+ON account.accountid = objecthub.objectid
+LIMIT 100;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.person_object_link(
+  id INT,
+  personid INT,
+  objectid INT
+)
+CLUSTERED BY (id, personid, objectid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_object_link;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.person_object_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY personid, objectid),
+  personid,
+  objectid
+FROM
+  processdb.person_object_link002;
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.person_location_link002(
+  personid INT,
+  locationid INT
+)
+CLUSTERED BY (personid, locationid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_location_link002;
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.person_location_link002
+SELECT DISTINCT
+  personlink001.id as personid,
+  locationlink001.id as locationid
+FROM
+  processdb.personlink001
+GROSS JOIN
+  processdb.locationlink001
+LIMIT 20;
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.person_location_link(
+  id INT,
+  personid INT,
+  locationid INT
+)
+CLUSTERED BY (id, personid, locationid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_location_link;
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.person_location_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY personid, locationid),
+  personid,
+  locationid
+FROM
+  processdb.person_location_link002;
+  
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.person_event_link002(
+  personid INT,
+  eventid INT
+)
+CLUSTERED BY (personid, eventid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_event_link002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.person_event_link002
+SELECT DISTINCT
+  personlink001.id as personid,
+  eventlink001.id as eventid
+FROM
+  processdb.personlink001
+GROSS JOIN
+  processdb.eventlink001
+LIMIT 20;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.person_event_link(
+  id INT,
+  personid INT,
+  eventid INT
+)
+CLUSTERED BY (id, personid, eventid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_event_link;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.person_event_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY personid, eventid),
+  personid,
+  eventid
+FROM
+  processdb.person_event_link002;
+  
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.person_time_link002(
+  personid INT,
+  timeid INT
+)
+CLUSTERED BY (personid, timeid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_time_link002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.person_time_link002
+SELECT DISTINCT
+  personlink001.id as personid,
+  timelink001.id as timeid
+FROM
+  processdb.personlink001
+GROSS JOIN
+  processdb.timelink001
+LIMIT 20;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.person_time_link(
+  id INT,
+  personid INT,
+  timeid INT
+)
+CLUSTERED BY (id, personid, timeid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.person_time_link;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.person_time_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY personid, timeid),
+  personid,
+  timeid
+FROM
+  processdb.person_time_link002;
+  
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.object_location_link002(
+  objectid INT,
+  locationid INT
+)
+CLUSTERED BY (objectid, locationid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.object_location_link002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.object_location_link002
+SELECT DISTINCT
+  objectlink001.id as objectid,
+  locationlink001.id as locationid
+FROM
+  processdb.objectlink001
+GROSS JOIN
+  processdb.locationlink001
+LIMIT 20;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.object_location_link(
+  id INT,
+  objectid INT,
+  locationid INT
+)
+CLUSTERED BY (id, objectid, locationid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.object_location_link;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.object_location_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY objectid, locationid),
+  objectid,
+  locationid
+FROM
+  processdb.object_location_link002;
+  
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.object_event_link002(
+  objectid INT,
+  eventid INT
+)
+CLUSTERED BY (objectid, eventid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.object_event_link002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.object_event_link002
+SELECT DISTINCT
+  objectlink001.id as objectid,
+  eventlink001.id as eventid
+FROM
+  processdb.objectlink001
+GROSS JOIN
+  processdb.eventlink001
+LIMIT 20;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.object_event_link(
+  id INT,
+  objectid INT,
+  eventid INT
+)
+CLUSTERED BY (id, objectid, eventid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.object_event_link;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.object_event_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY objectid, eventid),
+  objectid,
+  eventid
+FROM
+  processdb.object_event_link002;
+  
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.object_time_link002(
+  objectid INT,
+  timeid INT
+)
+CLUSTERED BY (objectid, timeid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.object_time_link002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.object_time_link002
+SELECT DISTINCT
+  objectlink001.id as objectid,
+  timelink001.id as timeid
+FROM
+  processdb.objectlink001
+GROSS JOIN
+  processdb.timelink001
+LIMIT 20;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.object_time_link(
+  id INT,
+  objectid INT,
+  timeid INT
+)
+CLUSTERED BY (id, objectid, timeid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.object_time_link;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.object_time_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY objectid, timeid),
+  objectid,
+  timeid
+FROM
+  processdb.object_time_link002;
+  
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.location_event_link002(
+  locationid INT,
+  eventid INT
+)
+CLUSTERED BY (locationid, eventid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.location_event_link002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.location_event_link002
+SELECT DISTINCT
+  locationlink001.id as locationid,
+  eventlink001.id as eventid
+FROM
+  processdb.locationlink001
+GROSS JOIN
+  processdb.eventlink001
+LIMIT 20;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.location_event_link(
+  id INT,
+  locationid INT,
+  eventid INT
+)
+CLUSTERED BY (id, locationid, eventid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.location_event_link;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.location_event_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY locationid, eventid),
+  locationid,
+  eventid
+FROM
+  processdb.location_event_link002;
+  
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.location_time_link002(
+  locationid INT,
+  timeid INT
+)
+CLUSTERED BY (locationid, timeid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.location_time_link002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.location_time_link002
+SELECT DISTINCT
+  locationlink001.id as locationid,
+  timelink001.id as timeid
+FROM
+  processdb.locationlink001
+GROSS JOIN
+  processdb.timelink001
+LIMIT 20;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.location_time_link(
+  id INT,
+  locationid INT,
+  timeid INT
+)
+CLUSTERED BY (id, locationid, timeid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.location_time_link;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.location_time_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY locationid, timeid),
+  locationid,
+  timeid
+FROM
+  processdb.location_time_link002;
+  
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.event_time_link002(
+  eventid INT,
+  timeid INT
+)
+CLUSTERED BY (eventid, timeid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.event_time_link002;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.event_time_link002
+SELECT DISTINCT
+  eventlink001.id as eventid,
+  timelink001.id as timeid
+FROM
+  processdb.eventlink001
+GROSS JOIN
+  processdb.timelink001
+LIMIT 20;
+
+--#######################################################################################################################################
+
+CREATE TABLE IF NOT EXISTS processdb.event_time_link(
+  id INT,
+  eventid INT,
+  timeid INT
+)
+CLUSTERED BY (id, eventid, timeid) INTO 1 BUCKETS
+STORED As orc
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.event_time_link;
+
+--#######################################################################################################################################
+INSERT INTO TABLE processdb.event_time_link
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY eventid, timeid),
+  eventid,
+  timeid
+FROM
+  processdb.event_time_link002;
+
+--#######################################################################################################################################  
+SHOW TABLES;

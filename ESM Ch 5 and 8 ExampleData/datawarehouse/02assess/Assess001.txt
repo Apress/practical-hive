@@ -1,0 +1,232 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+DROP DATABASE assessdb CASCADE;
+
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS assessdb;
+USE assessdb;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.firstname001 (
+  firstnameid    string,
+  firstname      string,
+  sex            string
+)
+CLUSTERED BY (firstnameid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.firstname001;
+
+INSERT INTO TABLE assessdb.firstname001 
+SELECT firstnameid, firstname, sex 
+FROM retrievedb.rawfirstname 
+WHERE firstnameid <> '"id"';
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.firstname002 (
+  firstnameid    string,
+  firstname      string,
+  sex            string
+)
+CLUSTERED BY (firstnameid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.firstname002;
+
+INSERT INTO TABLE assessdb.firstname002 
+SELECT firstnameid, rtrim(ltrim(firstname)), rtrim(ltrim(sex)) 
+FROM assessdb.firstname001;
+
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.firstname003 (
+  firstnameid    int,
+  firstname      string,
+  sex            string
+)
+CLUSTERED BY (firstnameid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.firstname003;
+
+INSERT INTO TABLE assessdb.firstname003 
+SELECT CAST(firstnameid as INT), SUBSTRING(firstname,2,LENGTH(firstname)-2), SUBSTRING(sex,2,LENGTH(sex)-2) 
+FROM assessdb.firstname002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.firstname (
+  firstnameid    int,
+  firstname      string,
+  sex            string
+)
+CLUSTERED BY (firstnameid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.firstname;
+
+INSERT INTO TABLE assessdb.firstname 
+SELECT firstnameid, firstname, sex 
+FROM assessdb.firstname003 
+ORDER BY firstnameid;
+
+TRUNCATE TABLE assessdb.firstname;
+
+INSERT INTO TABLE assessdb.firstname 
+SELECT firstnameid, firstname, sex 
+FROM assessdb.firstname003 
+SORT BY firstnameid;
+
+SELECT firstnameid, firstname, sex from assessdb.firstname SORT BY firstname LIMIT 10;
+
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.lastname001 (
+  lastnameid    string,
+  lastname      string
+)
+CLUSTERED BY (lastnameid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.lastname001;
+
+INSERT INTO TABLE assessdb.lastname001 
+SELECT lastnameid, lastname 
+FROM retrievedb.rawlastname 
+WHERE lastnameid <> '"id"';
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.lastname002 (
+  lastnameid    string,
+  lastname      string
+)
+CLUSTERED BY (lastnameid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.lastname002;
+
+INSERT INTO TABLE assessdb.lastname002 
+SELECT lastnameid, rtrim(ltrim(lastname)) 
+FROM assessdb.lastname001;
+
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.lastname003 (
+  lastnameid    int,
+  lastname      string
+)
+CLUSTERED BY (lastnameid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.lastname003;
+
+INSERT INTO TABLE assessdb.lastname003 
+SELECT CAST(lastnameid as INT), SUBSTRING(lastname,2,LENGTH(lastname)-2) 
+FROM assessdb.lastname002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.lastname (
+  lastnameid    int,
+  lastname      string
+)
+CLUSTERED BY (lastnameid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.lastname;
+
+INSERT INTO TABLE assessdb.lastname 
+SELECT lastnameid, lastname 
+FROM assessdb.lastname003 
+ORDER BY lastnameid;
+
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.person001 (
+  persid         string,
+  firstnameid    string,
+  lastnameid     string
+)
+CLUSTERED BY (persid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.person001;
+
+INSERT INTO TABLE assessdb.person001 
+SELECT persid, firstnameid, lastnameid 
+FROM retrievedb.rawperson 
+WHERE persid <> '"id"';
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.person002 (
+  persid         int,
+  firstnameid    int,
+  lastnameid     int
+)
+CLUSTERED BY (persid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.person002;
+
+INSERT INTO TABLE assessdb.person002 
+SELECT CAST(persid as INT), CAST(firstnameid as INT), CAST(lastnameid as INT) 
+FROM assessdb.person001;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.person (
+  persid         int,
+  firstnameid    int,
+  lastnameid     int
+)
+CLUSTERED BY (persid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.person;
+
+INSERT INTO TABLE assessdb.person 
+SELECT persid, firstnameid, lastnameid 
+FROM assessdb.person002;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS assessdb.personfull(
+  persid       int,
+  firstnameid  int,
+  firstname    string,
+  lastnameid   int,
+  lastname     string,
+  sex          string
+)
+CLUSTERED BY (persid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE assessdb.personfull;
+
+INSERT INTO TABLE assessdb.personfull
+SELECT person.persid, person.firstnameid, firstname.firstname, person.lastnameid, lastname.lastname, firstname.sex
+FROM assessdb.firstname 
+JOIN assessdb.person
+ON firstname.firstnameid = person.firstnameid
+JOIN assessdb.lastname 
+ON lastname.lastnameid = person.lastnameid;
+
+--#######################################################################################################################################
+--#######################################################################################################################################
+DROP TABLE assessdb.firstname001;
+DROP TABLE assessdb.firstname002;
+DROP TABLE assessdb.firstname003;
+DROP TABLE assessdb.lastname001;
+DROP TABLE assessdb.lastname002;
+DROP TABLE assessdb.lastname003;
+DROP TABLE assessdb.person001;
+DROP TABLE assessdb.person002;

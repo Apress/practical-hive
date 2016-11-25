@@ -1,0 +1,43 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+DROP DATABASE retrievedb CASCADE;
+
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS retrievedb;
+USE retrievedb;
+
+--#######################################################################################################################################
+--DROP TABLE retrievedb.rawfirstname;
+--DROP TABLE retrievedb.rawlastname;
+--DROP TABLE retrievedb.rawpersonname;
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS retrievedb.rawfirstname (
+  firstnameid    string,
+  firstname      string,
+  sex            string
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH 'file:///root/exampledata/datawarehouse/00rawdata/rawfirstname.csv' OVERWRITE INTO TABLE retrievedb.rawfirstname;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS retrievedb.rawlastname (
+  lastnameid    string,
+  lastname      string
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH 'file:///root/exampledata/datawarehouse/00rawdata/rawlastname.csv' OVERWRITE INTO TABLE retrievedb.rawlastname;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS retrievedb.rawperson (
+  persid         string,
+  firstnameid    string,
+  lastnameid     string
+)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+
+LOAD DATA LOCAL INPATH 'file:///root/exampledata/datawarehouse/00rawdata/rawperson.csv' OVERWRITE INTO TABLE retrievedb.rawperson;
+
+--#######################################################################################################################################

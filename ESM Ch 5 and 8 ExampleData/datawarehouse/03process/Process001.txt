@@ -1,0 +1,208 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+DROP DATABASE processdb CASCADE;
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS processdb;
+USE processdb;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.personhub (
+  id         INT,
+  keyid      STRING,
+  firstname  STRING,
+  lastname   STRING
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.personhub001 (
+  firstname  STRING,
+  lastname   STRING
+)
+CLUSTERED BY (firstname, lastname) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.personhub001;
+
+INSERT INTO TABLE processdb.personhub001 
+SELECT DISTINCT
+  firstname, 
+  lastname 
+FROM 
+  assessdb.personfull;
+
+ 
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.personhub002 (
+  rid         BIGINT,
+  tid         BIGINT,
+  firstname   STRING,
+  lastname    STRING
+)
+CLUSTERED BY (rid, tid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.personhub002; 
+
+INSERT INTO TABLE processdb.personhub002
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY firstname, lastname),
+  unix_timestamp(), 
+  firstname, 
+  lastname 
+FROM 
+  processdb.personhub001;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.personhub003 (
+  keyid      STRING,
+  firstname  STRING,
+  lastname   STRING
+)
+CLUSTERED BY (keyid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.personhub003;
+
+INSERT INTO TABLE processdb.personhub003
+SELECT 
+  CONCAT(tid, '/', rid), 
+  firstname, 
+  lastname 
+FROM 
+  processdb.personhub002;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.personhub004 (
+  keyid      STRING,
+  firstname  STRING,
+  lastname   STRING,
+  CDC        STRING
+)
+CLUSTERED BY (keyid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.personhub004;
+
+INSERT INTO TABLE processdb.personhub004
+SELECT 
+  A.keyid, 
+  A.firstname, 
+  A.lastname,
+  B.keyid
+FROM 
+  processdb.personhub003 AS A
+LEFT JOIN
+  processdb.personhub AS B
+ON
+  A.firstname = B.firstname  AND A.lastname = B.lastname;
+ 
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.personhub005 (
+  keyid      STRING,
+  firstname  STRING,
+  lastname   STRING
+)
+CLUSTERED BY (keyid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.personhub005;
+
+INSERT INTO TABLE processdb.personhub005
+SELECT 
+  keyid, 
+  firstname, 
+  lastname 
+FROM 
+  processdb.personhub004
+WHERE CDC IS NULL;
+
+INSERT INTO TABLE processdb.personhub005
+SELECT 
+  keyid, 
+  firstname, 
+  lastname 
+FROM 
+  processdb.personhub;
+
+
+--#######################################################################################################################################
+
+TRUNCATE TABLE processdb.personhub;
+
+INSERT INTO TABLE processdb.personhub
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY keyid),
+  keyid, 
+  firstname, 
+  lastname 
+FROM 
+  processdb.personhub005;
+     
+--#######################################################################################################################################   
+--#######################################################################################################################################  
+DROP TABLE processdb.personhub001; 
+DROP TABLE processdb.personhub002; 
+DROP TABLE processdb.personhub003; 
+DROP TABLE processdb.personhub004;
+
+--#######################################################################################################################################   
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.personsexsatellite001 (
+  keyid      STRING,
+  sex        STRING
+)
+CLUSTERED BY (keyid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.personsexsatellite001;
+
+INSERT INTO TABLE processdb.personsexsatellite001
+SELECT DISTINCT
+  A.keyid, 
+  B.sex 
+FROM 
+  processdb.personhub005 as A
+JOIN  
+  assessdb.personfull AS B
+ON
+  A.firstname = B.firstname AND A.lastname = B.lastname;
+   
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.personsexsatellite (
+  id         INT,
+  keyid      STRING,
+  sex        STRING,
+  timestmp   BIGINT
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.personsexsatellite;
+
+INSERT INTO TABLE processdb.personsexsatellite
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY keyid),
+  keyid, 
+  sex,
+  unix_timestamp()
+FROM 
+  processdb.personsexsatellite001;
+   
+--#######################################################################################################################################   
+--#######################################################################################################################################
+DROP TABLE processdb.objecthub001;
+DROP TABLE processdb.personsexsatellite001;
+  
+--#######################################################################################################################################
+SHOW TABLES;

@@ -1,0 +1,9 @@
+USE census;
+CREATE TABLE personhub (
+  persid         int
+);
+INSERT OVERWRITE TABLE personhub SELECT DISTINCT persid FROM Person;
+SELECT persid FROM personhub where persid < 11;
+INSERT INTO TABLE personhub SELECT DISTINCT persid FROM Person;
+SELECT persid FROM personhub where persid < 11;
+

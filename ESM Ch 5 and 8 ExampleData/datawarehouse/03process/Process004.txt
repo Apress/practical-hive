@@ -1,0 +1,101 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS processdb;
+USE processdb;
+  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.eventhub (
+  id          int,
+  eventtype  string,
+  eventname  string,
+  eventid    int
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE processdb.eventhub;
+
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.eventhub001 (  
+  eventtype  string,
+  eventname  string,
+  eventid    int
+)
+CLUSTERED BY (eventtype, eventname,eventid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.eventhub001;
+
+INSERT INTO TABLE processdb.eventhub001 
+SELECT DISTINCT
+  'intangible', 
+  'banktransaction',
+  id as eventid 
+FROM 
+  assessdb.account;
+
+--#######################################################################################################################################
+TRUNCATE TABLE processdb.eventhub;
+
+INSERT INTO TABLE processdb.eventhub 
+SELECT DISTINCT
+  ROW_NUMBER() OVER (ORDER BY eventtype,eventname,eventid),
+  eventtype, 
+  eventname,
+  eventid 
+FROM 
+  processdb.eventhub001;
+     
+--#######################################################################################################################################   
+--#######################################################################################################################################  
+CREATE TABLE IF NOT EXISTS processdb.eventbanktransactionsatellite0001 (
+  accountid           int,
+  transactionid       int,
+  balance             DECIMAL(18, 9)
+)
+CLUSTERED BY (accountid,transactionid) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.eventbanktransactionsatellite001;
+
+INSERT INTO TABLE processdb.eventbanktransactionsatellite0001
+SELECT 
+  accountid, 
+  id as transactionid,
+  balance 
+FROM 
+  assessdb.account;
+   
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS processdb.eventbanktransactionsatellite (
+  id                  int,
+  accountid           int,
+  transactionid       int,
+  balance             DECIMAL(18, 9),
+  timestmp            bigint
+)
+CLUSTERED BY (id) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+TRUNCATE TABLE processdb.eventbanktransactionsatellite;
+
+INSERT INTO TABLE processdb.eventbanktransactionsatellite
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY accountid,transactionid),
+  accountid, 
+  transactionid,
+  balance,
+  unix_timestamp()
+FROM 
+  processdb.eventbanktransactionsatellite0001;
+   
+--#######################################################################################################################################   
+--#######################################################################################################################################
+DROP TABLE processdb.eventbanktransactionsatellite0001;
+DROP TABLE processdb.eventhub001;
+SHOW TABLES;

@@ -1,0 +1,9 @@
+USE census;
+
+SELECT /*+ MAPJOIN(b) */ personname.firstname, 
+personname.lastname
+FROM
+census.personname
+LEFT SEMI JOIN
+census.address
+ON (personname.persid = address.persid);

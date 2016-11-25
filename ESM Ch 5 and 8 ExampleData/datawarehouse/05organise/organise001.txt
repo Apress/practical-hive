@@ -1,0 +1,180 @@
+--#######################################################################################################################################
+--#######################################################################################################################################
+--#######################################################################################################################################
+DROP DATABASE organisedb CASCADE;
+
+--#######################################################################################################################################
+CREATE DATABASE IF NOT EXISTS organisedb;
+USE organisedb;
+
+--#######################################################################################################################################
+--#######################################################################################################################################  
+--#######################################################################################################################################
+--CREATE TABLE IF NOT EXISTS organisedb.dimperson (
+--  personkey  BIGINT,
+--  firstname  STRING,
+--  lastname   STRING
+--)
+--CLUSTERED BY (firstname, lastname,personkey) INTO 1 BUCKETS
+--STORED AS orc 
+--TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+CREATE TABLE IF NOT EXISTS organisedb.dimperson LIKE transformdb.dimperson;
+
+
+--#######################################################################################################################################
+TRUNCATE TABLE organisedb.dimperson;
+  
+--#######################################################################################################################################
+INSERT INTO TABLE organisedb.dimperson
+SELECT 
+  personkey,
+  firstname, 
+  lastname 
+FROM 
+  transformdb.dimperson
+ORDER BY firstname, lastname, personkey; 
+
+--#######################################################################################################################################
+--#######################################################################################################################################  
+--#######################################################################################################################################
+--CREATE TABLE IF NOT EXISTS organisedb.dimaccount (
+--  accountkey      BIGINT,
+--  accountnumber   INT
+--)
+--CLUSTERED BY (accountnumber,accountkey) INTO 1 BUCKETS
+--STORED AS orc 
+--TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+
+CREATE TABLE IF NOT EXISTS organisedb.dimaccount LIKE transformdb.dimaccount;
+
+--#######################################################################################################################################
+TRUNCATE TABLE organisedb.dimaccount;
+
+--#######################################################################################################################################
+INSERT INTO TABLE organisedb.dimaccount 
+SELECT DISTINCT
+  accountkey,
+  accountnumber  
+FROM 
+  transformdb.dimaccount
+ORDER BY accountnumber; 
+
+--#######################################################################################################################################
+--#######################################################################################################################################  
+--#######################################################################################################################################
+--CREATE TABLE IF NOT EXISTS organisedb.fctpersonaccount (
+--  personaccountkey     BIGINT,
+--  personkey            BIGINT,
+--  accountkey           BIGINT,
+--  balance             DECIMAL(18, 9)
+--)
+--CLUSTERED BY (personkey,accountkey) INTO 1 BUCKETS
+--STORED AS orc 
+--TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+ 
+CREATE TABLE IF NOT EXISTS organisedb.fctpersonaccount LIKE transformdb.fctpersonaccount;
+ 
+--#######################################################################################################################################
+TRUNCATE TABLE organisedb.fctpersonaccount;
+
+--#######################################################################################################################################
+INSERT INTO TABLE organisedb.fctpersonaccount 
+SELECT DISTINCT
+  personaccountkey,
+  personkey,
+  accountkey,
+  balance
+FROM 
+  transformdb.fctpersonaccount
+WHERE
+  personaccountkey = 1
+ORDER BY personaccountkey,personkey,accountkey; 
+
+-- SELECT * FROM organisedb.fctpersonaccount;
+
+--#######################################################################################################################################
+--#######################################################################################################################################  
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS organisedb.dimaddress(
+  addresskey    BIGINT,
+  postcode      STRING
+)
+CLUSTERED BY (addresskey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+ 
+--#######################################################################################################################################
+TRUNCATE TABLE organisedb.dimaddress;
+
+--#######################################################################################################################################
+INSERT INTO TABLE organisedb.dimaddress 
+SELECT DISTINCT
+  addresskey,
+  postcode  
+FROM 
+  transformdb.dimaddress
+ORDER BY addresskey; 
+
+--#######################################################################################################################################
+--####################################################################################################################################### 
+--#######################################################################################################################################
+DROP TABLE organisedb.dimaddress;
+ 
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS organisedb.dimaddress(
+  addresskey    BIGINT,
+  postcode      STRING
+)
+CLUSTERED BY (addresskey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+ 
+--#######################################################################################################################################
+TRUNCATE TABLE organisedb.dimaddress;
+
+--#######################################################################################################################################
+INSERT INTO TABLE organisedb.dimaddress 
+SELECT DISTINCT
+  addresskey,
+  postcode  
+FROM 
+  transformdb.dimaddress
+ORDER BY addresskey; 
+
+--#######################################################################################################################################
+--####################################################################################################################################### 
+--#######################################################################################################################################
+CREATE TABLE IF NOT EXISTS organisedb.fctpersonaddressdate(
+  personaddressdatekey      BIGINT,
+  personkey                 BIGINT,
+  addresskey                BIGINT,
+  datetimekey               BIGINT
+)
+CLUSTERED BY (datetimekey) INTO 1 BUCKETS
+STORED AS orc 
+TBLPROPERTIES('transactional' = 'true','orc.compress'='ZLIB','orc.create.index'='true');
+   
+--#######################################################################################################################################
+TRUNCATE TABLE organisedb.fctpersonaddressdate;
+
+--#######################################################################################################################################
+--#######################################################################################################################################
+INSERT INTO TABLE organisedb.fctpersonaddressdate 
+SELECT
+  personaddressdatekey,
+  personkey,
+  addresskey,
+  datetimekey
+FROM 
+  transformdb.fctpersonaddressdate
+WHERE personaddressdatekey = 1
+ORDER BY 
+  personaddressdatekey,
+  personkey,
+  addresskey,
+  datetimekey; 
+   
+--#######################################################################################################################################
+SHOW TABLES;
+ 
